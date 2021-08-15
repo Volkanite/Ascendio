@@ -32,8 +32,46 @@ entities.add(playable)
 def update():
     tiles.update()
     entities.update()
+    
+    collided_x = False
 
     # Player collision goes here
+    if playable.rect.bottom > RESOLUTION[1]:
+        playable.rect.bottom = RESOLUTION[1]
+        playable.acc.y = 0
+        
+
+    for ti in levels.tiles:
+
+        # Put X Axis Collision Here
+        if ti.rect.colliderect(playable.rect.x + playable.acc.x, playable.rect.y, playable.width, playable.height):
+
+            if playable.vel.x > 0 and ti.rect.top < playable.rect.top:
+                playable.image.fill((0,0,255))
+                collided_x = True
+                playable.pos.x = playable.uncollided.x - 1
+                playable.vel.x = 0
+            elif playable.vel.x < 0 and ti.rect.top < playable.rect.top:
+                playable.image.fill((0,255,0))
+                collided_x = True
+                playable.pos.x = playable.uncollided.x + 1
+                playable.vel.x = 0
+                    
+        if ti.rect.colliderect(playable.rect.x, playable.rect.y + (playable.acc.y * 1.6), playable.width, playable.height):
+
+            # Y-axis Collision
+            if playable.vel.y < 0 and ti.rect.bottom < playable.rect.bottom:
+                    playable.pos.y = ti.rect.bottom + playable.height
+                    playable.vel.y = 0
+
+            elif playable.vel.y >= 0 and ti.rect.top > playable.rect.top:
+                    playable.pos.y = ti.rect.top
+                    playable.vel.y = 0
+                    
+            playable.rect.midbottom = playable.pos
+            
+    if not collided_x: 
+        playable.uncollided = playable.pos
 
 
 def draw():
@@ -53,11 +91,11 @@ while running:
 
         if event.type == KEYDOWN:
             if event.key == pygame.K_SPACE:
-                
+
                 # Tests if the player is standing on solid ground
-                playable.rect.x += 1
+                playable.rect.y += 1
                 hits = pygame.sprite.spritecollide(playable, tiles, False)
-                playable.rect.x -= 1
+                playable.rect.y -= 1
                 playable.jump(hits)
 
     update()

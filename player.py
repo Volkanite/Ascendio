@@ -19,10 +19,12 @@ class Player(pygame.sprite.Sprite):
         self.original_image.fill((255, 0, 0))
         self.image = self.original_image
         self.rect = self.image.get_rect()
+        self.rect.center = vec(self.width / 2, self.height /2)
         self.pos = vec(0, 0)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
-
+        # self.hits = []
+        self.uncollided = self.pos
     def jump(self, able):
         if able:
             self.vel.y = -18
