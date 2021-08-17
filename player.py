@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import levels
 
 # Alias for Vector2
 vec = pygame.math.Vector2
@@ -13,24 +14,52 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.width = 40
-        self.height = 40
-        self.original_image = pygame.Surface((self.width, self.height))
-        self.original_image.fill((255, 0, 0))
+        self.width = 60
+        self.height = 120
+        self.spritesheet = levels.SpriteSheet("assets/agents/characters.png")
+        self.load_images()
+        self.original_image = self.idle_frames[0]
+        self.original_image.set_colorkey((255, 0, 255))
         self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.pos = vec(0, 0)
+        self.pos = vec(self.width, 0)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
-        self.speed = 8
+        self.speed = 18
         self.uncollided = self.pos
+        self.agent_num = 0
+
+        self.walking = False
+        self.jumping = False
+        self.current_frame = 0
+        self.last_update = 0
+
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(0, 0, 60, 120),
+                            self.spritesheet.get_image(60, 120, 60, 120)]
+
+        self.jumping_frames = [self.spritesheet.get_image(120, 120, 72, 120),
+                               pygame.transform.flip(self.spritesheet.get_image(120, 120, 72, 120), True, False)]
+
+        self.walking_frames_r = [self.spritesheet.get_image(0, 0, 60, 120),
+                               self.spritesheet.get_image(60, 0, 60, 120),
+                               self.spritesheet.get_image(120, 0, 60, 120),
+                               self.spritesheet.get_image(180, 0, 75, 120),
+                               self.spritesheet.get_image(255, 0, 75, 120)]
+
+        self.walking_frames_l = []
+
+        for frame in self.walking_frames_r:
+            self.walking_frames_l.append(pygame.transform.flip(frame, True, False))
 
     def jump(self, able):
         if able:
-            self.vel.y = -18
+            self.vel.y = -23
+            self.jumping = True
 
     def update(self):
         # Sets acceleration values
+        self.animate()
         self.acc = vec(0, 1.95 * gravity)
         key_state = pygame.key.get_pressed()
 
@@ -45,3 +74,52 @@ class Player(pygame.sprite.Sprite):
         self.pos.y += self.vel.y + 0.5 * self.acc.y
 
         self.rect.midbottom = self.pos
+
+    def animate(self):
+        now = pygame.time.get_ticks()
+
+        if self.acc.x != 0:
+            self.walking = True
+        else:
+            self.walking = False
+
+        # Walking Animation
+        if self.walking and not self.jumping:
+            if now - self.last_update > 90:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.walking_frames_l)
+
+                if self.acc.x > 0:
+                    self.original_image = self.walking_frames_r[self.current_frame]
+                    self.original_image.set_colorkey((255, 0, 255))
+                else:
+                    self.original_image = self.walking_frames_l[self.current_frame]
+                    self.original_image.set_colorkey((255, 0, 255))
+
+                self.width = self.original_image.get_width()
+                self.height = self.original_image.get_height()
+                self.image = self.original_image
+
+        if self.jumping:
+
+            if self.acc.x < 0:
+                self.original_image = self.jumping_frames[1]
+                self.original_image.set_colorkey((255, 0, 255))
+            else:
+                self.original_image = self.jumping_frames[0]
+                self.original_image.set_colorkey((255, 0, 255))
+
+            self.width = self.original_image.get_width()
+            self.height = self.original_image.get_height()
+            self.image = self.original_image
+
+        # Idle Animation
+        if not self.jumping and not self.walking:
+            if now - self.last_update > 200:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+                self.original_image = self.idle_frames[self.current_frame]
+                self.original_image.set_colorkey((255, 0, 255))
+                self.width = self.original_image.get_width()
+                self.height = self.original_image.get_height()
+                self.image = self.original_image

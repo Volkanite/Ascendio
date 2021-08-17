@@ -62,22 +62,24 @@ def update():
     if playable.rect.bottom > pygame.display.get_surface().get_size()[1]:
         playable.rect.bottom = pygame.display.get_surface().get_size()[1]
         playable.acc.y = 0
+        playable.jumping = False
 
     for ti in levels.tiles:
 
         # Put X Axis Collision Here
         if ti.rect.colliderect(playable.rect.x, playable.rect.y, playable.width, playable.height):
 
-            if playable.acc.x > 0 and ti.rect.top < playable.rect.top:
-                playable.image.fill((0, 0, 255))
+            if playable.acc.x > 0 and ti.rect.top - playable.height * 2 / 3 < playable.rect.top:
                 collided_x = True
                 playable.pos.x = playable.uncollided.x
                 playable.pos.x -= abs(playable.speed * playable.acc.x)
-            elif playable.acc.x < 0 and ti.rect.top < playable.rect.top:
-                playable.image.fill((0, 255, 0))
+
+            elif playable.acc.x < 0 and ti.rect.top - playable.height * 2 / 3 < playable.rect.top:
                 collided_x = True
                 playable.pos.x = playable.uncollided.x
                 playable.pos.x += abs(playable.speed * playable.acc.x)
+
+            playable.rect.midbottom = playable.pos
 
         if ti.rect.colliderect(playable.rect.x, playable.rect.y, playable.width,
                                playable.height):
@@ -90,6 +92,7 @@ def update():
             elif playable.vel.y >= 0 and ti.rect.top > playable.rect.top:
                 playable.pos.y = ti.rect.top
                 playable.vel.y = 0
+                playable.jumping = False
 
             playable.rect.midbottom = playable.pos
 
@@ -128,4 +131,6 @@ while running:
     pygame.display.update()
     clock.tick(FPS)
 
-pygame.quit()
+
+def quit_game():
+    pygame.quit()
