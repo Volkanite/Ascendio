@@ -15,7 +15,7 @@ pygame.init()
 pygame.mixer.init()
 
 (options, args) = parser.parse_args()
-FPS = options.fps
+FPS = int(options.fps)
 
 if (options.windowed):
     window = pygame.display.set_mode((1280, 720))
