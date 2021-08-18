@@ -1,15 +1,27 @@
 import pygame
 from pygame.locals import *
+from optparse import OptionParser
 
 import levels
 import player
 
-FPS = 30
+
+# Game Options
+parser = OptionParser()
+parser.add_option('-w', '--windowed', dest='windowed', help='Runs the game in windowed mode', default=None)
+parser.add_option('-f', '--fps', dest='fps', help='Set frame rate', default=30)
 
 pygame.init()
 pygame.mixer.init()
 
-window = pygame.display.set_mode((0, 0), FULLSCREEN)
+(options, args) = parser.parse_args()
+FPS = options.fps
+
+if (options.windowed):
+    window = pygame.display.set_mode((1280, 720))
+else:
+    window = pygame.display.set_mode((0, 0), FULLSCREEN) 
+
 pygame.display.set_caption("Ascendio")
 logo = pygame.image.load('assets/logo.png')
 logo.set_colorkey((255, 0, 255))
