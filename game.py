@@ -9,14 +9,19 @@ import player
 # Game Options
 parser = OptionParser()
 parser.add_option('-w', '--windowed', dest='windowed', help='Runs the game in windowed mode', default=None)
-parser.add_option('-f', '--fps', dest='fps', help='Set frame rate', default=30)
+parser.add_option('-f', '--fps', dest='fps', help='Set frame rate', default=None)
 
 pygame.init()
 pygame.mixer.init()
 
 (options, args) = parser.parse_args()
-FPS = int(options.fps)
+FPS = 30
+show_fps = False
 
+if (options.fps):
+    FPS = int(options.fps)
+    show_fps = True
+    
 if (options.windowed):
     window = pygame.display.set_mode((1280, 720))
 else:
@@ -27,9 +32,12 @@ logo = pygame.image.load('assets/logo.png')
 logo.set_colorkey((255, 0, 255))
 pygame.display.set_icon(logo)
 font_name = pygame.font.match_font('arial')
+font_fps = pygame.font.Font(font_name, 20)
 
 clock = pygame.time.Clock()
 pygame.key.set_repeat(FPS)
+old_frame_rate = 0.0
+new_frame_rate = 0.0
 
 # Creates a new level
 level = levels.Level(levels.tile_maps[levels.level_num])
@@ -113,10 +121,33 @@ def update():
         playable.uncollided = playable.pos
 
 
+def draw_frame_rate():
+
+    # FPS calculation
+    global old_frame_rate
+    global new_frame_rate
+    
+    new_frame_rate = clock.get_fps()
+    new_frame_rate = new_frame_rate * 0.1 + old_frame_rate * 0.9
+    old_frame_rate = new_frame_rate
+    
+    if (new_frame_rate > float(FPS) and new_frame_rate - float(FPS) < 1.6):
+        new_frame_rate = float(FPS)
+        
+    fps = font_fps.render(str(int(new_frame_rate)), 
+            True, 
+            (255, 0,0) if new_frame_rate < float(FPS-5) else (0,255,0))
+            
+    window.blit(fps, (pygame.display.get_surface().get_size()[0] - 50, 10))
+
+
 def draw():
     window.fill((255, 255, 255))
     tiles.draw(window)
     entities.draw(window)
+    
+    if show_fps:
+        draw_frame_rate()
     
     
 def draw_text(surf, text, size, x, y):
