@@ -8,7 +8,7 @@ import player
 
 # Game Options
 parser = OptionParser()
-parser.add_option('-w', '--windowed', dest='windowed', help='Runs the game in windowed mode', default=None)
+parser.add_option('-w', '--windowed', dest='windowed', action='store_true', help='Runs the game in windowed mode', default=None)
 parser.add_option('-f', '--fps', dest='fps', help='Set frame rate', default=None)
 
 pygame.init()
