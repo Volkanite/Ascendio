@@ -9,7 +9,7 @@ FPS = 30
 pygame.init()
 pygame.mixer.init()
 
-window = pygame.display.set_mode((1280, 720))
+window = pygame.display.set_mode((0, 0), FULLSCREEN)
 pygame.display.set_caption("Ascendio")
 logo = pygame.image.load('assets/logo.png')
 logo.set_colorkey((255, 0, 255))
