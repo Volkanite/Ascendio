@@ -9,11 +9,12 @@ FPS = 30
 pygame.init()
 pygame.mixer.init()
 
-window = pygame.display.set_mode((0, 0), FULLSCREEN)
+window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Ascendio")
 logo = pygame.image.load('assets/logo.png')
 logo.set_colorkey((255, 0, 255))
 pygame.display.set_icon(logo)
+font_name = pygame.font.match_font('arial')
 
 clock = pygame.time.Clock()
 pygame.key.set_repeat(FPS)
@@ -104,32 +105,80 @@ def draw():
     window.fill((255, 255, 255))
     tiles.draw(window)
     entities.draw(window)
+    
+    
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, (255, 255, 255))
+    text_rec = text_surface.get_rect()
+    text_rec.midtop = (x, y)
+    surf.blit(text_surface, text_rec)
+    return y
+
+    
+def draw_menu():
+
+    display_width = pygame.display.get_surface().get_size()[0]
+    display_height = pygame.display.get_surface().get_size()[1]
+    waiting = True
+    line_spacing = 30
+    
+    window.fill((0, 0, 0))
+    draw_text(window, "Ascendio", 64, display_width / 2, display_height / 4)
+    y = draw_text(window, "W A S D to move", 22, display_width / 2, display_height / 2)
+    y = draw_text(window, "Space to jump", 22, display_width / 2, y + line_spacing)
+    draw_text(window, "LMB to fire", 22, display_width / 2, y + line_spacing)       
+    draw_text(window, "Press any key to start game", 18, display_width / 2, display_height * 3 / 4)
+    
+    pygame.display.flip()
+    
+    while waiting:
+        clock.tick(FPS)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return 2 # Quit
+                
+            if event.type == pygame.KEYUP:
+                return 1 # Start Game
+                
+    return 0 # Keep running menu
 
 
 running = True
+playing = False
+
 
 while running:
 
-    for event in pygame.event.get():
-
-        if event.type == QUIT:
-            running = False
-
-        if event.type == KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                # Tests if the player is standing on solid ground
-                playable.rect.y += 1
-                hits = pygame.sprite.spritecollide(playable, tiles, False)
-                playable.rect.y -= 1
-                playable.jump(hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right))
-
-    update()
-
-    draw()
-
-    # Update Display
-    pygame.display.update()
-    clock.tick(FPS)
+    # Menu screen
+    while not playing:
+        playing = draw_menu()
+        
+    if playing == 2:
+        running = False
+    
+    if playing == 1:
+        for event in pygame.event.get():
+        
+            if event.type == QUIT:
+                running = False
+        
+            if event.type == KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    # Tests if the player is standing on solid ground
+                    playable.rect.y += 1
+                    hits = pygame.sprite.spritecollide(playable, tiles, False)
+                    playable.rect.y -= 1
+                    playable.jump(hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right))
+        
+        update()
+        
+        draw()
+        
+        # Update Display
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 def quit_game():
