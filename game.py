@@ -120,7 +120,6 @@ def draw_menu():
 
     display_width = pygame.display.get_surface().get_size()[0]
     display_height = pygame.display.get_surface().get_size()[1]
-    waiting = True
     line_spacing = 30
     
     window.fill((0, 0, 0))
@@ -131,16 +130,14 @@ def draw_menu():
     draw_text(window, "Press any key to start game", 18, display_width / 2, display_height * 3 / 4)
     
     pygame.display.flip()
+    clock.tick(FPS)
     
-    while waiting:
-        clock.tick(FPS)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return 2 # Quit
-                
-            if event.type == pygame.KEYUP:
-                return 1 # Start Game
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return 2 # Quit
+            
+        if event.type == pygame.KEYUP:
+            return 1 # Start Game
                 
     return 0 # Keep running menu
 
