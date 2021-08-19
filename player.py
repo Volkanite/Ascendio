@@ -22,7 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.original_image.set_colorkey((255, 0, 255))
         self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.pos = vec(self.width, 0)
+        self.pos = vec(self.width, self.height * 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.speed = 18
