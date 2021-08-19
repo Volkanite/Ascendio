@@ -24,6 +24,7 @@ if options.windowed:
 else:
     window = pygame.display.set_mode((0, 0), FULLSCREEN)
 
+
 pygame.display.set_caption("Ascendio")
 logo = pygame.image.load('assets/logo.png')
 logo.set_colorkey((255, 0, 255))
@@ -154,9 +155,7 @@ def draw_frame_rate():
     if new_frame_rate > float(FPS) and new_frame_rate - float(FPS) < 1.6:
         new_frame_rate = float(FPS)
 
-    fps = font_fps.render(str(int(new_frame_rate)),
-                          True,
-                          (255, 0, 0) if new_frame_rate < float(FPS - 5) else (0, 255, 0))
+    fps = font_fps.render(str(int(new_frame_rate)), True, (255, 0, 0) if new_frame_rate < float(FPS - 5) else (0, 255, 0))
 
     window.blit(fps, (pygame.display.get_surface().get_size()[0] - 50, 10))
 
