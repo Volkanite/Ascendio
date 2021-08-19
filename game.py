@@ -19,6 +19,10 @@ pygame.mixer.init()
 FPS = 30
 show_fps = False
 
+if (options.fps):
+    FPS = int(options.fps)
+    show_fps = True
+
 if options.windowed:
     window = pygame.display.set_mode((1280, 720))
 else:
