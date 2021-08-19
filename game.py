@@ -19,7 +19,7 @@ pygame.mixer.init()
 FPS = 30
 show_fps = False
 
-if (options.fps):
+if options.fps:
     FPS = int(options.fps)
     show_fps = True
 
