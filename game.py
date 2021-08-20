@@ -4,6 +4,7 @@ from optparse import OptionParser
 
 import levels
 import player
+import enemy
 import sounds
 
 
@@ -44,11 +45,18 @@ new_frame_rate = 0.0
 on_screen = pygame.sprite.Group()
 
 tiles = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
 
 
 # Creates a new level
 def create_level():
     level = levels.Level(levels.tile_maps[levels.level_num])
+
+    enemy.create_enemies(19)
+
+    for e in enemy.enemies:
+        enemies.add(e)
+        entities.add(e)
 
     for tile in levels.tiles:
         tiles.add(tile)
@@ -66,12 +74,18 @@ def move_camera():
 
         playable.pos.x -= int(abs(playable.speed * 0.55 + 1))
 
+        for e in enemies:
+            e.rect.x -= int(abs(playable.speed * 0.55 + 1))
+
         for tile in tiles:
             tile.rect.x -= int(abs(playable.speed * 0.55 + 1))
 
     elif playable.rect.left < pygame.display.get_surface().get_size()[0] / 3:
 
         playable.pos.x += int(abs(playable.speed * 0.55 + 1))
+
+        for e in enemies:
+            e.rect.x += int(abs(playable.speed * 0.55 + 1))
 
         for tile in tiles:
             tile.rect.x += int(abs(playable.speed * 0.55 + 1))
@@ -80,13 +94,19 @@ def move_camera():
 
         playable.pos.y += int(abs(playable.vel.y + 0.5 * playable.acc.y))
 
+        for e in enemies:
+            e.rect.y += int(abs(playable.vel.y + 0.5 * playable.acc.y))
+
         for tile in tiles:
             tile.rect.y += int(abs(playable.vel.y + 0.5 * playable.acc.y))
 
     elif pygame.display.get_surface().get_size()[1] * 7 / 8 < playable.rect.bottom < \
             pygame.display.get_surface().get_size()[1] * 15 / 16:
 
-        playable.pos.y -= int(abs(playable.vel.y ))
+        playable.pos.y -= int(abs(playable.vel.y))
+
+        for e in enemies:
+            e.rect.y -= int(abs(playable.vel.y + 0.5 * playable.acc.y))
 
         for tile in tiles:
             tile.rect.y -= int(abs(playable.vel.y))
@@ -95,6 +115,7 @@ def move_camera():
 def update():
     tiles.update()
     entities.update()
+    enemies.update()
     collided_x = False
     move_camera()
 
@@ -169,6 +190,7 @@ def draw():
 
     on_screen.draw(window)
     entities.draw(window)
+    enemies.draw(window)
 
     if show_fps:
         draw_frame_rate()
@@ -183,7 +205,7 @@ def draw_text(surf, text, size, x, y):
     return y
 
 
-menu = sounds.Sound("menu", sounds.sound_lengths["menu"], 100)
+menu = sounds.Sound("menu", sounds.sound_lengths["menu"], 1)
 
 
 def draw_menu():
@@ -218,7 +240,7 @@ def draw_menu():
 running = True
 playing = False
 
-level_music = sounds.Sound(str(levels.level_num), sounds.sound_lengths[str(levels.level_num)], 1700)
+level_music = sounds.Sound(str(levels.level_num), sounds.sound_lengths[str(levels.level_num)], 100)
 
 while running:
 

@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 import json
+import enemy
 
 m = open("levels.json",)
 maps = json.load(m)
@@ -64,6 +65,7 @@ class Level:
             for x in range(map_width):
                 # Creates tiles for everything except open air
                 if self.tile_map[y * map_width + x] != 0:
+
                     switcher = switch.get(self.tile_map[y * map_width + x], (255, 0, 0))
                     tile = Tile(x * map_width, y * map_height, self.spritesheet.get_image(switcher[0], switcher[1], switcher[2], switcher[3]))
                     tiles.append(tile)
