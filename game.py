@@ -46,13 +46,23 @@ on_screen = pygame.sprite.Group()
 tiles = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 entities = pygame.sprite.Group()
+
+level = None
 playable = None
 
 
 # Creates a new level
 def create_level():
+    global level
+    
+    on_screen.empty()
+    tiles.empty()
+    enemies.empty()
     entities.empty()
     
+    if level:
+        level.clear()
+        
     level = levels.Level(levels.tile_maps[levels.level_num])
 
     enemy.create_enemies(19)
