@@ -197,7 +197,7 @@ def draw_frame_rate():
 
     fps = font_fps.render(str(int(new_frame_rate)), True, (255, 0, 0) if new_frame_rate < float(FPS - 5) else (0, 255, 0))
 
-    window.blit(fps, (pygame.display.get_surface().get_size()[0] - 50, 10))
+    window.blit(fps, (10, 10))
 
 
 def draw():
