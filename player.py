@@ -21,6 +21,8 @@ class Player(pygame.sprite.Sprite):
         self.original_image = self.idle_frames[0]
         self.original_image.set_colorkey((255, 0, 255))
         self.image = self.original_image
+        self.mini_img = pygame.transform.scale(self.original_image, (15, 25))
+        self.mini_img.set_colorkey((255, 0, 255))
         self.rect = self.image.get_rect()
         self.pos = vec(self.width, self.height * 2)
         self.vel = vec(0, 0)
@@ -33,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
         self.current_frame = 0
         self.last_update = 0
+        self.lives = 3
 
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0, 0, 60, 120),

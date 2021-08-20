@@ -42,8 +42,9 @@ old_frame_rate = 0.0
 new_frame_rate = 0.0
 
 on_screen = pygame.sprite.Group()
-
 tiles = pygame.sprite.Group()
+entities = pygame.sprite.Group()
+playable = None
 
 
 # Creates a new level
@@ -54,10 +55,13 @@ def create_level():
         tiles.add(tile)
 
 
-entities = pygame.sprite.Group()
-
-playable = player.Player()
-entities.add(playable)
+# Creates a new player
+def create_player():
+    global playable
+    
+    entities.empty()
+    playable = player.Player()
+    entities.add(playable)
 
 
 def move_camera():
@@ -107,9 +111,9 @@ def update():
 
     # Player collision goes here
     if playable.rect.bottom > pygame.display.get_surface().get_size()[1]:
-        playable.rect.bottom = pygame.display.get_surface().get_size()[1]
-        playable.acc.y = 0
+        playable.pos = pygame.math.Vector2(playable.width, playable.height * 2)
         playable.jumping = False
+        playable.lives -= 1
 
     for ti in on_screen:
 
@@ -169,11 +173,22 @@ def draw():
 
     on_screen.draw(window)
     entities.draw(window)
+    
+    draw_lives(window, pygame.display.get_surface().get_size()[0] - 100, 5, playable.lives, playable.mini_img)
+    #draw_health_bar()
 
     if show_fps:
         draw_frame_rate()
 
 
+def draw_lives(surf, x, y, lives, img):
+    for i in range(lives):
+        img_rect = img.get_rect()
+        img_rect.x = x + 20 * i
+        img_rect.y = y
+        surf.blit(img, img_rect)
+
+        
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surface = font.render(text, True, (255, 255, 255))
@@ -210,6 +225,7 @@ def draw_menu():
         if event.type == pygame.KEYUP:
             menu.stop_playing()
             create_level()
+            create_player()
             return 1  # Start Game
 
     return 0  # Keep running menu
@@ -242,6 +258,9 @@ while running:
                     playable.rect.y -= 1
                     playable.jump(
                         hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right))
+        
+        if playable.lives == 0:
+            playing = False # show menu screen
 
         update()
 
