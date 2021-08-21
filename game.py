@@ -78,6 +78,19 @@ def create_level():
     for tile in levels.tiles:
         tiles.add(tile)
 
+        
+# Resets the tiles in a level
+def reset_level():
+    global level
+    
+    tiles.empty()
+    
+    level.clear()
+    level = levels.Level(levels.tile_maps[levels.level_num])
+    
+    for tile in levels.tiles:
+        tiles.add(tile)
+
 
 # Creates a new player
 def create_player():
@@ -152,9 +165,9 @@ def update():
 
     # Player collision goes here
     if playable.rect.bottom > pygame.display.get_surface().get_size()[1]:
-        playable.pos = pygame.math.Vector2(playable.width, playable.height * 2)
-        playable.jumping = False
         playable.lives -= 1
+        playable.reset()
+        reset_level()
 
     for e in enemies:
 

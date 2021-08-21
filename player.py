@@ -23,7 +23,8 @@ class Player(pygame.sprite.Sprite):
         self.image = self.original_image
         self.mini_img = pygame.transform.scale(self.original_image, (15, 25))
         self.mini_img.set_colorkey((255, 0, 255))
-        self.rect = self.image.get_rect()
+        self.original_rect = self.image.get_rect()
+        self.rect = self.original_rect
         self.pos = vec(self.width, self.height * 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -64,7 +65,14 @@ class Player(pygame.sprite.Sprite):
 
         for frame in self.firing_frames_r:
             self.firing_frames_l.append(pygame.transform.flip(frame, True, False))
-
+    
+    def reset(self):
+        self.rect = self.original_rect
+        self.pos = vec(self.width, self.height * 2)
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.jumping = False
+        
     def jump(self, able):
         if able:
             self.vel.y = -23
