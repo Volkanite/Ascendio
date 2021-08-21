@@ -6,6 +6,7 @@ import levels
 import player
 import enemy
 import sounds
+import bullet
 
 
 # Game Options
@@ -46,6 +47,7 @@ on_screen = pygame.sprite.Group()
 tiles = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 entities = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
 
 level = None
 playable = None
@@ -132,10 +134,15 @@ def update():
     tiles.update()
     enemies.update()
     entities.update()
+    bullets.update()
     collided_x = False
     move_camera()
 
     on_screen.empty()
+
+    for b in bullets:
+        if b.rect.right < 0 or b.rect.left > pygame.display.get_surface().get_size()[0]:
+            b.kill()
 
     for tile in tiles:
         if tile.rect.right >= 0 and tile.rect.left <= pygame.display.get_surface().get_size()[0]:
@@ -220,6 +227,7 @@ def draw():
     on_screen.draw(window)
     enemies.draw(window)
     entities.draw(window)
+    bullets.draw(window)
     
     draw_lives(window, pygame.display.get_surface().get_size()[0] - 100, 5, playable.lives, playable.mini_img)
     # draw_health_bar()
@@ -310,6 +318,16 @@ while running:
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
                     playable.firing = True
+                    b = bullet.Bullet(playable.rect.right, playable.rect.top + 30)
+                    if playable.acc.x >= 0:
+                        b.direction = 1
+
+                    elif playable.acc.x < 0:
+                        b.direction = -1
+                        b.image = pygame.transform.flip(b.original_image, True, False)
+                        b.pos.x = playable.rect.left
+
+                    bullets.add(b)
         
         if playable.lives == 0:
             playing = False  # show menu screen

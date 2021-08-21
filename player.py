@@ -35,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.jumping = False
         self.firing = False
         self.current_frame = 0
+        self.firing_frame = 0
         self.last_update = 0
         self.lives = 3
 
@@ -95,6 +96,28 @@ class Player(pygame.sprite.Sprite):
         else:
             self.walking = False
 
+        # Firing Animation
+        if self.firing:
+
+            if now - self.last_update > 90:
+                self.last_update = now
+                self.firing_frame = (self.firing_frame + 1) % len(self.firing_frames_l)
+
+                if (self.firing_frame + 1) % len(self.firing_frames_l) == 0:
+                    self.firing = False
+
+                if self.acc.x >= 0:
+                    self.original_image = self.firing_frames_r[self.firing_frame]
+                    self.original_image.set_colorkey((255, 0, 255))
+
+                else:
+                    self.original_image = self.firing_frames_l[self.firing_frame]
+                    self.original_image.set_colorkey((255, 0, 255))
+
+                self.width = self.original_image.get_width()
+                self.height = self.original_image.get_height()
+                self.image = self.original_image
+
         # Walking Animation
         if self.walking and not self.jumping:
             if now - self.last_update > 90:
@@ -136,24 +159,4 @@ class Player(pygame.sprite.Sprite):
                 self.height = self.original_image.get_height()
                 self.image = self.original_image
 
-        if self.firing:
-
-            if now - self.last_update > 90:
-                self.last_update = now
-                self.current_frame = (self.current_frame + 1) % len(self.firing_frames_l)
-
-                if (self.current_frame + 1) % len(self.firing_frames_l) == 0:
-                    self.firing = False
-
-                if self.acc.x >= 0:
-                    self.original_image = self.firing_frames_r[self.current_frame]
-                    self.original_image.set_colorkey((255, 0, 255))
-
-                else:
-                    self.original_image = self.firing_frames_l[self.current_frame]
-                    self.original_image.set_colorkey((255, 0, 255))
-
-                self.width = self.original_image.get_width()
-                self.height = self.original_image.get_height()
-                self.image = self.original_image
 
