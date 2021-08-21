@@ -68,7 +68,8 @@ def create_level():
         level.clear()
         
     level = levels.Level(levels.tile_maps[levels.level_num])
-
+    
+    enemy.enemies.clear()
     enemy.create_enemies(19)
 
     for e in enemy.enemies:
