@@ -7,6 +7,8 @@ map_height = 18
 
 enemies = []
 
+vec = pygame.math.Vector2
+
 
 class Enemy(pygame.sprite.Sprite):
 
@@ -18,8 +20,19 @@ class Enemy(pygame.sprite.Sprite):
         self.original_image.fill((255, 0, 0))
         self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.pos = vec(x, y)
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.rect.midbottom = self.pos
+
+    def update(self):
+        self.acc = vec(0, 1.95)
+        self.vel += self.acc
+        self.pos += self.vel + 0.5 * self.acc
+        self.rect.midbottom = self.pos
+
+        if self.rect.bottom > pygame.display.get_surface().get_size()[1]:
+            self.rect.bottom = pygame.display.get_surface().get_size()[1]
 
 
 def create_enemies(num_of_enemies):
@@ -30,8 +43,7 @@ def create_enemies(num_of_enemies):
     for enemy in range(num_of_enemies):
 
         left = random.randrange(lower_bound, upper_bound)
-        print(left)
-        e = Enemy(left, 120)
+        e = Enemy(left, 60)
 
         lower_bound = e.rect.right + random.randrange(50, 200) * 5
         upper_bound = lower_bound + 100
