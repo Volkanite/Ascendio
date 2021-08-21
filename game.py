@@ -59,6 +59,8 @@ def create_level():
     tiles.empty()
     enemies.empty()
     entities.empty()
+    tiles.empty()
+    enemies.empty()
     
     if level:
         level.clear()
@@ -128,8 +130,8 @@ def move_camera():
 
 def update():
     tiles.update()
-    entities.update()
     enemies.update()
+    entities.update()
     collided_x = False
     move_camera()
 
@@ -216,8 +218,8 @@ def draw():
     window.fill((255, 255, 255))
 
     on_screen.draw(window)
-    entities.draw(window)
     enemies.draw(window)
+    entities.draw(window)
     
     draw_lives(window, pygame.display.get_surface().get_size()[0] - 100, 5, playable.lives, playable.mini_img)
     # draw_health_bar()
@@ -269,6 +271,7 @@ def draw_menu():
 
         if event.type == pygame.KEYUP:
             menu.stop_playing()
+            level = None
             create_level()
             create_player()
             return 1  # Start Game
@@ -303,6 +306,10 @@ while running:
                     playable.rect.y -= 1
                     playable.jump(
                         hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right))
+
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    playable.firing = True
         
         if playable.lives == 0:
             playing = False  # show menu screen

@@ -1,6 +1,7 @@
 import random
 
 import pygame
+import levels
 
 map_width = 241
 map_height = 18
@@ -14,10 +15,12 @@ class Enemy(pygame.sprite.Sprite):
 
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.width = 60
+        self.width = 72
         self.height = 120
-        self.original_image = pygame.Surface((self.width, self.height))
-        self.original_image.fill((255, 0, 0))
+        self.spritesheet = levels.SpriteSheet("assets/agents/characters.png")
+        self.load_images()
+        self.original_image = self.idle_frames[0]
+        self.original_image.set_colorkey((255, 0, 255))
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
@@ -25,7 +28,15 @@ class Enemy(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.rect.midbottom = self.pos
 
+        self.last_update = 0
+        self.current_frame = 0
+
+    def load_images(self):
+        self.idle_frames = [self.spritesheet.get_image(0, 240, 72, 120),
+                            self.spritesheet.get_image(72, 240, 72, 120)]
+
     def update(self):
+        self.animate()
         self.acc = vec(0, 1.95)
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
@@ -33,6 +44,16 @@ class Enemy(pygame.sprite.Sprite):
 
         if self.rect.bottom > pygame.display.get_surface().get_size()[1]:
             self.rect.bottom = pygame.display.get_surface().get_size()[1]
+
+    def animate(self):
+        now = pygame.time.get_ticks()
+
+        if now - self.last_update > 200:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
+            self.original_image = self.idle_frames[self.current_frame]
+            self.original_image.set_colorkey((255, 0, 255))
+            self.image = self.original_image
 
 
 def create_enemies(num_of_enemies):

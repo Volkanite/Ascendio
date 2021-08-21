@@ -33,12 +33,13 @@ class Player(pygame.sprite.Sprite):
 
         self.walking = False
         self.jumping = False
+        self.firing = False
         self.current_frame = 0
         self.last_update = 0
         self.lives = 3
 
     def load_images(self):
-        self.idle_frames = [self.spritesheet.get_image(0, 0, 60, 120),
+        self.idle_frames = [self.spritesheet.get_image(0, 120, 60, 120),
                             self.spritesheet.get_image(60, 120, 60, 120)]
 
         self.jumping_frames = [self.spritesheet.get_image(120, 120, 72, 120),
@@ -52,8 +53,16 @@ class Player(pygame.sprite.Sprite):
 
         self.walking_frames_l = []
 
+        self.firing_frames_r = [self.spritesheet.get_image(192, 120, 78, 120),
+                                self.spritesheet.get_image(270, 120, 66, 120)]
+
+        self.firing_frames_l = []
+
         for frame in self.walking_frames_r:
             self.walking_frames_l.append(pygame.transform.flip(frame, True, False))
+
+        for frame in self.firing_frames_r:
+            self.firing_frames_l.append(pygame.transform.flip(frame, True, False))
 
     def jump(self, able):
         if able:
@@ -126,3 +135,25 @@ class Player(pygame.sprite.Sprite):
                 self.width = self.original_image.get_width()
                 self.height = self.original_image.get_height()
                 self.image = self.original_image
+
+        if self.firing:
+
+            if now - self.last_update > 90:
+                self.last_update = now
+                self.current_frame = (self.current_frame + 1) % len(self.firing_frames_l)
+
+                if (self.current_frame + 1) % len(self.firing_frames_l) == 0:
+                    self.firing = False
+
+                if self.acc.x >= 0:
+                    self.original_image = self.firing_frames_r[self.current_frame]
+                    self.original_image.set_colorkey((255, 0, 255))
+
+                else:
+                    self.original_image = self.firing_frames_l[self.current_frame]
+                    self.original_image.set_colorkey((255, 0, 255))
+
+                self.width = self.original_image.get_width()
+                self.height = self.original_image.get_height()
+                self.image = self.original_image
+
