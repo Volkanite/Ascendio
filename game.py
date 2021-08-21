@@ -69,7 +69,6 @@ def create_level():
 
     for e in enemy.enemies:
         enemies.add(e)
-        entities.add(e)
 
     for tile in levels.tiles:
         tiles.add(tile)
@@ -90,7 +89,7 @@ def move_camera():
         playable.pos.x -= int(abs(playable.speed * 0.55 + 1))
 
         for e in enemies:
-            e.rect.x -= int(abs(playable.speed * 0.55 + 1))
+            e.pos.x -= int(abs(playable.speed * 0.55 + 1))
 
         for tile in tiles:
             tile.rect.x -= int(abs(playable.speed * 0.55 + 1))
@@ -100,7 +99,7 @@ def move_camera():
         playable.pos.x += int(abs(playable.speed * 0.55 + 1))
 
         for e in enemies:
-            e.rect.x += int(abs(playable.speed * 0.55 + 1))
+            e.pos.x += int(abs(playable.speed * 0.55 + 1))
 
         for tile in tiles:
             tile.rect.x += int(abs(playable.speed * 0.55 + 1))
@@ -121,7 +120,7 @@ def move_camera():
         playable.pos.y -= int(abs(playable.vel.y))
 
         for e in enemies:
-            e.rect.y -= int(abs(playable.vel.y + 0.5 * playable.acc.y))
+            e.rect.y -= int(abs(playable.vel.y))
 
         for tile in tiles:
             tile.rect.y -= int(abs(playable.vel.y))
@@ -147,6 +146,20 @@ def update():
         playable.jumping = False
         playable.lives -= 1
 
+    for e in enemies:
+
+        for ti in tiles:
+
+            if ti.rect.colliderect(e.rect.x, e.rect.y, e.width, e.height):
+
+                if e.vel.y < 0 and ti.rect.bottom < e.rect.bottom:
+                    e.pos.y = ti.rect.bottom - e.height
+                    e.vel.y = 0
+
+                elif e.vel.y >= 0 and ti.rect.top > e.rect.top:
+                    e.pos.y = ti.rect.top
+                    e.vel.y = 0
+
     for ti in on_screen:
 
         # Put X Axis Collision Here
@@ -164,8 +177,7 @@ def update():
 
             playable.rect.midbottom = playable.pos
 
-        if ti.rect.colliderect(playable.rect.x, playable.rect.y, playable.width,
-                               playable.height):
+        if ti.rect.colliderect(playable.rect.x, playable.rect.y, playable.width, playable.height):
 
             # Y-axis Collision
             if playable.vel.y < 0 and ti.rect.bottom < playable.rect.bottom:
@@ -208,7 +220,7 @@ def draw():
     enemies.draw(window)
     
     draw_lives(window, pygame.display.get_surface().get_size()[0] - 100, 5, playable.lives, playable.mini_img)
-    #draw_health_bar()
+    # draw_health_bar()
 
     if show_fps:
         draw_frame_rate()
@@ -293,7 +305,7 @@ while running:
                         hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right))
         
         if playable.lives == 0:
-            playing = False # show menu screen
+            playing = False  # show menu screen
 
         update()
 
