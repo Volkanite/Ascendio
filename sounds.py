@@ -9,6 +9,7 @@ snds = json.load(s)
 sounds = {}
 sound_lengths = {
     "menu": 17500,
+    "jump": 453,
     "0": 22500
 }
 

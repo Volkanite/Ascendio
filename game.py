@@ -83,6 +83,11 @@ def reset_level():
     for tile in tiles:
         tile.rect = tile.original_rect.copy()
 
+    for e in enemies:
+        e.pos.x = e.original_rect.x
+        e.rect.midbottom = e.pos
+
+
 
 # Creates a new player
 def create_player():
@@ -149,6 +154,15 @@ def update():
     for b in bullets:
         if b.rect.right < 0 or b.rect.left > pygame.display.get_surface().get_size()[0]:
             b.kill()
+
+        for e in enemies:
+
+            if b.rect.colliderect(e.rect.x, e.rect.y, e.width, e.height):
+                b.kill()
+                e.health -= 40
+
+                if e.health < 0:
+                    e.kill()
 
     for tile in tiles:
         if tile.rect.right >= 0 and tile.rect.left <= pygame.display.get_surface().get_size()[0]:
@@ -297,6 +311,7 @@ running = True
 playing = False
 
 level_music = sounds.Sound(str(levels.level_num), sounds.sound_lengths[str(levels.level_num)], 100)
+jump_sound = sounds.Sound("jump", sounds.sound_lengths["jump"], 1)
 
 while running:
 
@@ -320,6 +335,9 @@ while running:
                     playable.rect.y -= 1
                     playable.jump(
                         hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right))
+
+                    if hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right):
+                        jump_sound.play_sound()
 
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:

@@ -1,4 +1,5 @@
 {
   "menu" : "audio/menu.wav",
+  "jump" : "audio/jump.wav",
   "0" : "audio/0.wav"
 }

@@ -27,9 +27,12 @@ class Enemy(pygame.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.rect.midbottom = self.pos
+        self.original_rect = self.rect.copy()
 
         self.last_update = 0
         self.current_frame = 0
+
+        self.health = 100
 
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0, 240, 72, 120),
