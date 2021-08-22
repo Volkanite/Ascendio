@@ -81,15 +81,9 @@ def create_level():
         
 # Resets the tiles in a level
 def reset_level():
-    global level
-    
-    tiles.empty()
-    
-    level.clear()
-    level = levels.Level(levels.tile_maps[levels.level_num])
-    
-    for tile in levels.tiles:
-        tiles.add(tile)
+
+    for tile in tiles:
+        tile.rect = tile.original_rect.copy()
 
 
 # Creates a new player

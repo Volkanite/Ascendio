@@ -86,4 +86,5 @@ class Tile(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x * (self.tile_width / map_width)
         self.rect.y = y * (self.tile_height / map_height)
+        self.original_rect = self.rect.copy()
 
