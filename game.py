@@ -61,8 +61,6 @@ def create_level():
     tiles.empty()
     enemies.empty()
     entities.empty()
-    tiles.empty()
-    enemies.empty()
     
     if level:
         level.clear()
