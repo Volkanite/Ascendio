@@ -249,13 +249,24 @@ def draw():
     entities.draw(window)
     bullets.draw(window)
     
-    draw_lives(window, pygame.display.get_surface().get_size()[0] - 100, 5, playable.lives, playable.mini_img)
-    # draw_health_bar()
+    draw_hud()
 
     if show_fps:
         draw_frame_rate()
 
 
+def draw_hud():
+    window_width = pygame.display.get_surface().get_size()[0]
+    
+    draw_lives(window, window_width - 100, 5, playable.lives, playable.mini_img)
+    # draw_health_bar()
+    draw_timer(window, window_width / 2, 5)
+
+    
+def draw_timer(surface, x, y):
+    draw_text(surface, str(int(round((pygame.time.get_ticks() - playable.start_time) / 1000, 0))), 24, x, y, (0, 0, 0))
+    
+    
 def draw_lives(surf, x, y, lives, img):
     for i in range(lives):
         img_rect = img.get_rect()
@@ -264,9 +275,9 @@ def draw_lives(surf, x, y, lives, img):
         surf.blit(img, img_rect)
 
         
-def draw_text(surf, text, size, x, y):
+def draw_text(surf, text, size, x, y, color):
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, (255, 255, 255))
+    text_surface = font.render(text, True, color)
     text_rec = text_surface.get_rect()
     text_rec.midtop = (x, y)
     surf.blit(text_surface, text_rec)
@@ -280,15 +291,16 @@ def draw_menu():
     display_width = pygame.display.get_surface().get_size()[0]
     display_height = pygame.display.get_surface().get_size()[1]
     line_spacing = 30
+    color = (255, 255, 255)
 
     menu.play_sound()
 
     window.fill((0, 0, 0))
-    draw_text(window, "Ascendio", 64, display_width / 2, display_height / 4)
-    y = draw_text(window, "W A S D to move", 22, display_width / 2, display_height / 2)
-    y = draw_text(window, "Space to jump", 22, display_width / 2, y + line_spacing)
-    draw_text(window, "LMB to fire", 22, display_width / 2, y + line_spacing)
-    draw_text(window, "Press any key to start game", 18, display_width / 2, display_height * 3 / 4)
+    draw_text(window, "Ascendio", 64, display_width / 2, display_height / 4, color)
+    y = draw_text(window, "W A S D to move", 22, display_width / 2, display_height / 2, color)
+    y = draw_text(window, "Space to jump", 22, display_width / 2, y + line_spacing, color)
+    draw_text(window, "LMB to fire", 22, display_width / 2, y + line_spacing, color)
+    draw_text(window, "Press any key to start game", 18, display_width / 2, display_height * 3 / 4, color)
 
     pygame.display.flip()
     clock.tick(FPS)

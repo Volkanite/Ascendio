@@ -39,6 +39,7 @@ class Player(pygame.sprite.Sprite):
         self.firing_frame = 0
         self.last_update = 0
         self.lives = 3
+        self.start_time = pygame.time.get_ticks()
 
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0, 120, 60, 120),
