@@ -42,6 +42,8 @@ clock = pygame.time.Clock()
 pygame.key.set_repeat(FPS)
 old_frame_rate = 0.0
 new_frame_rate = 0.0
+timer_animate_min = 24
+timer_animate_max = 120
 
 on_screen = pygame.sprite.Group()
 tiles = pygame.sprite.Group()
@@ -51,11 +53,13 @@ bullets = pygame.sprite.Group()
 
 level = None
 playable = None
+last_tile = None
 
 
 # Creates a new level
 def create_level():
     global level
+    global last_tile
     
     on_screen.empty()
     tiles.empty()
@@ -75,6 +79,9 @@ def create_level():
 
     for tile in levels.tiles:
         tiles.add(tile)
+        
+    # get last tile for level progress
+    last_tile = levels.tiles[-1]
 
         
 # Resets the tiles in a level
@@ -222,6 +229,13 @@ def update():
 
     if not collided_x:
         playable.uncollided = playable.pos
+    
+    # check for end of level (kinda)
+    if playable.rect.x > last_tile.rect.x - 100:
+        global game_over
+        game_over = 1
+        if not playable.end_time:
+            playable.end_time = pygame.time.get_ticks()
 
 
 def draw_frame_rate():
@@ -260,11 +274,29 @@ def draw_hud():
     
     draw_lives(window, window_width - 100, 5, playable.lives, playable.mini_img)
     # draw_health_bar()
-    draw_timer(window, window_width / 2, 5)
+    
+    # timer
+    if playable.end_time:
+        global timer_animate_min
+        
+        if timer_animate_min < timer_animate_max:
+            timer_animate_min += 1
+        
+    draw_timer(window, 
+        window_width / 2, 
+        5, 
+        timer_animate_min,
+        playable.end_time if playable.end_time else pygame.time.get_ticks() - playable.start_time,
+        playable.end_time)
 
     
-def draw_timer(surface, x, y):
-    draw_text(surface, str(int(round((pygame.time.get_ticks() - playable.start_time) / 1000, 0))), 24, x, y, (0, 0, 0))
+def draw_timer(surface, x, y, size, time, unit):
+    timer_string = str(int(round(time / 1000, 0)))
+    
+    if unit:
+        timer_string += " s"
+        
+    draw_text(surface, timer_string, size, x, y, (0, 0, 0))
     
     
 def draw_lives(surf, x, y, lives, img):
@@ -320,7 +352,8 @@ def draw_menu():
 
 
 running = True
-playing = False
+playing = 0
+game_over = 0
 
 level_music = sounds.Sound(str(levels.level_num), sounds.sound_lengths[str(levels.level_num)], 100)
 jump_sound = sounds.Sound("jump", sounds.sound_lengths["jump"], 1)
