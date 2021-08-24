@@ -302,9 +302,12 @@ def draw_hud():
 
 
 def draw_score(surface, x, y, size):
-    timer_string = str(int((kills * 1000) / int(round(playable.end_time / 1000, 0)) * 10)) + " points"
+    if kills:
+        score = int((kills * 1000) / int(round(playable.end_time / 1000, 0)) * 10)
+    else:
+        score = int(500 / int(round(playable.end_time / 1000, 0)) * 10)
         
-    draw_text(surface, timer_string, size, x, y, (0, 0, 0))
+    draw_text(surface, str(score) + " points", size, x, y, (0, 0, 0))
     
     
 def draw_timer(surface, x, y, size, time, unit):
