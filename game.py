@@ -357,9 +357,10 @@ def draw_menu():
 
     window.fill((0, 0, 0))
     draw_text(window, "Ascendio", 64, display_width / 2, display_height / 4, color)
-    y = draw_text(window, "W A S D to move", 22, display_width / 2, display_height / 2, color)
+    y = draw_text(window, "A D to move", 22, display_width / 2, display_height / 2, color)
     y = draw_text(window, "Space to jump", 22, display_width / 2, y + line_spacing, color)
-    draw_text(window, "LMB to fire", 22, display_width / 2, y + line_spacing, color)
+    y = draw_text(window, "LMB to fire", 22, display_width / 2, y + line_spacing, color)
+    draw_text(window, "Esc to exit", 22, display_width / 2, y + line_spacing, color)
     draw_text(window, "Press any key to start game", 18, display_width / 2, display_height * 3 / 4, color)
 
     pygame.display.flip()
@@ -370,11 +371,15 @@ def draw_menu():
             return 2  # Quit
 
         if event.type == pygame.KEYUP:
-            menu.stop_playing()
-            level = None
-            create_level()
-            create_player()
-            return 1  # Start Game
+            if event.key != pygame.K_ESCAPE:
+                menu.stop_playing()
+                level = None
+                create_level()
+                create_player()
+                return 1  # Start Game
+
+            elif event.key == pygame.K_ESCAPE:
+                return 2
 
     return 0  # Keep running menu
 
@@ -413,6 +418,9 @@ while running:
 
                     if hits and (playable.rect.left > hits[0].rect.left or playable.rect.right < hits[0].rect.right):
                         jump_sound.play_sound()
+
+                if event.key == pygame.K_ESCAPE:
+                    running = False
 
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
