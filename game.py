@@ -234,7 +234,7 @@ def update():
         playable.uncollided = playable.pos
     
     # check for end of level (kinda)
-    if playable.rect.x > last_tile.rect.x - 100:
+    if playable.rect.x > last_tile.rect.x - 200:
         global game_over
         game_over = 1
         if not playable.end_time:
