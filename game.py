@@ -43,7 +43,8 @@ pygame.key.set_repeat(FPS)
 old_frame_rate = 0.0
 new_frame_rate = 0.0
 timer_animate_min = 24
-timer_animate_max = 120
+timer_animate_max = 100
+kills = 0
 
 on_screen = pygame.sprite.Group()
 tiles = pygame.sprite.Group()
@@ -169,7 +170,9 @@ def update():
                 e.health -= 40
 
                 if e.health < 0:
+                    global kills
                     e.kill()
+                    kills += 1
 
     for tile in tiles:
         if tile.rect.right >= 0 and tile.rect.left <= pygame.display.get_surface().get_size()[0]:
@@ -276,12 +279,17 @@ def draw_hud():
     # draw_health_bar()
     
     # timer
+    global timer_animate_min
+    
     if playable.end_time:
-        global timer_animate_min
-        
         if timer_animate_min < timer_animate_max:
             timer_animate_min += 1
-        
+            
+        draw_score(window, 
+            window_width / 2, 
+            125, 
+            timer_animate_min)   
+            
     draw_timer(window, 
         window_width / 2, 
         5, 
@@ -289,6 +297,15 @@ def draw_hud():
         playable.end_time if playable.end_time else pygame.time.get_ticks() - playable.start_time,
         playable.end_time)
 
+    # kills
+    draw_kills(window, 50, 5, enemy.enemies[0].mini_img)
+
+
+def draw_score(surface, x, y, size):
+    timer_string = str(int((kills * 1000) / int(round(playable.end_time / 1000, 0)) * 10)) + " points"
+        
+    draw_text(surface, timer_string, size, x, y, (0, 0, 0))
+    
     
 def draw_timer(surface, x, y, size, time, unit):
     timer_string = str(int(round(time / 1000, 0)))
@@ -305,6 +322,14 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.x = x + 20 * i
         img_rect.y = y
         surf.blit(img, img_rect)
+        
+        
+def draw_kills(surf, x, y, img):
+    img_rect = img.get_rect()
+    img_rect.x = x
+    img_rect.y = y
+    surf.blit(img, img_rect)
+    draw_text(window, "x " + str(kills), 24, x + 35, 5, (0,0,0))
 
         
 def draw_text(surf, text, size, x, y, color):

@@ -21,6 +21,8 @@ class Enemy(pygame.sprite.Sprite):
         self.load_images()
         self.original_image = self.idle_frames[0]
         self.original_image.set_colorkey((255, 0, 255))
+        self.mini_img = pygame.transform.scale(self.original_image, (15, 25))
+        self.mini_img.set_colorkey((255, 0, 255))
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.pos = vec(x, y)
