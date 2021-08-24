@@ -37,6 +37,8 @@ logo.set_colorkey((255, 0, 255))
 pygame.display.set_icon(logo)
 font_name = pygame.font.match_font('arial')
 font_fps = pygame.font.Font(font_name, 20)
+menu_background = pygame.image.load("assets/menu_background.png").convert()
+background = pygame.image.load("assets/background.png").convert()
 
 clock = pygame.time.Clock()
 pygame.key.set_repeat(FPS)
@@ -55,6 +57,20 @@ bullets = pygame.sprite.Group()
 level = None
 playable = None
 last_tile = None
+
+
+class Background:
+
+    def __init__(self, image):
+        self.x = -200
+        self.y = -50
+        self.image = image
+
+    def draw(self):
+        window.blit(self.image, (self.x, self.y))
+
+
+bg = Background(background)
 
 
 # Creates a new level
@@ -96,7 +112,6 @@ def reset_level():
         e.rect.midbottom = e.pos
 
 
-
 # Creates a new player
 def create_player():
     global playable
@@ -111,6 +126,8 @@ def move_camera():
 
         playable.pos.x -= int(abs(playable.speed * 0.55 + 1))
 
+        bg.x -= int(abs(playable.speed * 0.55 + 1) / 4)
+
         for e in enemies:
             e.pos.x -= int(abs(playable.speed * 0.55 + 1))
 
@@ -120,6 +137,8 @@ def move_camera():
     elif playable.rect.left < pygame.display.get_surface().get_size()[0] / 3:
 
         playable.pos.x += int(abs(playable.speed * 0.55 + 1))
+
+        bg.x += int(abs(playable.speed * 0.55 + 1) / 4)
 
         for e in enemies:
             e.pos.x += int(abs(playable.speed * 0.55 + 1))
@@ -259,7 +278,7 @@ def draw_frame_rate():
 
 
 def draw():
-    window.fill((255, 255, 255))
+    bg.draw()
 
     on_screen.draw(window)
     enemies.draw(window)
@@ -355,7 +374,7 @@ def draw_menu():
 
     menu.play_sound()
 
-    window.fill((0, 0, 0))
+    window.blit(menu_background, (0, 0))
     draw_text(window, "Ascendio", 64, display_width / 2, display_height / 4, color)
     y = draw_text(window, "A D to move", 22, display_width / 2, display_height / 2, color)
     y = draw_text(window, "Space to jump", 22, display_width / 2, y + line_spacing, color)
