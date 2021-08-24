@@ -44,4 +44,6 @@ class Sound:
 
     def stop_playing(self):
         sounds[self.sound].stop()
-
+        
+    def set_volume(self, value):
+        sounds[self.sound].set_volume(value)

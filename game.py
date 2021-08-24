@@ -385,6 +385,8 @@ game_over = 0
 
 level_music = sounds.Sound(str(levels.level_num), sounds.sound_lengths[str(levels.level_num)], 100)
 jump_sound = sounds.Sound("jump", sounds.sound_lengths["jump"], 1)
+jump_sound.set_volume(0.3)
+
 
 while running:
 
