@@ -19,7 +19,7 @@ class Enemy(pygame.sprite.Sprite):
         self.height = 120
         self.spritesheet = levels.SpriteSheet("assets/agents/characters.png")
         self.load_images()
-        self.original_image = self.idle_frames[0]
+        self.original_image = self.idle_frames_l[0]
         self.original_image.set_colorkey((255, 0, 255))
         self.mini_img = pygame.transform.scale(self.original_image, (15, 25))
         self.mini_img.set_colorkey((255, 0, 255))
@@ -38,8 +38,13 @@ class Enemy(pygame.sprite.Sprite):
         self.health = 100
 
     def load_images(self):
-        self.idle_frames = [self.spritesheet.get_image(0, 240, 72, 120),
+        self.idle_frames_l = [self.spritesheet.get_image(0, 240, 72, 120),
                             self.spritesheet.get_image(72, 240, 72, 120)]
+
+        self.idle_frames_r = []
+
+        for frame in self.idle_frames_l:
+            self.idle_frames_r.append(pygame.transform.flip(frame, True, False))
 
     def update(self):
         self.animate()
@@ -56,10 +61,17 @@ class Enemy(pygame.sprite.Sprite):
 
         if now - self.last_update > 200:
             self.last_update = now
-            self.current_frame = (self.current_frame + 1) % len(self.idle_frames)
-            self.original_image = self.idle_frames[self.current_frame]
-            self.original_image.set_colorkey((255, 0, 255))
-            self.image = self.original_image
+            self.current_frame = (self.current_frame + 1) % len(self.idle_frames_l)
+
+            if self.facing == -1:
+                self.original_image = self.idle_frames_l[self.current_frame]
+                self.original_image.set_colorkey((255, 0, 255))
+                self.image = self.original_image
+
+            elif self.facing == 1:
+                self.original_image = self.idle_frames_r[self.current_frame]
+                self.original_image.set_colorkey((255, 0, 255))
+                self.image = self.original_image
 
 
 def create_enemies(num_of_enemies):
