@@ -53,6 +53,7 @@ tiles = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 entities = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
+pellets = pygame.sprite.Group()
 
 level = None
 playable = None
@@ -156,6 +157,12 @@ def move_camera():
         for tile in tiles:
             tile.rect.y += int(abs(playable.vel.y + 0.5 * playable.acc.y))
 
+        for b in bullets:
+            b.rect.y += int(abs(playable.vel.y + 0.5 * playable.acc.y))
+
+        for p in bullets:
+            p.rect.y += int(abs(playable.vel.y + 0.5 * playable.acc.y))
+
     elif pygame.display.get_surface().get_size()[1] * 7 / 8 < playable.rect.bottom < \
             pygame.display.get_surface().get_size()[1] * 15 / 16:
 
@@ -167,12 +174,19 @@ def move_camera():
         for tile in tiles:
             tile.rect.y -= int(abs(playable.vel.y))
 
+        for b in bullets:
+            b.rect.y -= int(abs(playable.vel.y))
+
+        for p in bullets:
+            p.rect.y -= int(abs(playable.vel.y))
+
 
 def update():
     tiles.update()
     enemies.update()
     entities.update()
     bullets.update()
+    pellets.update()
     collided_x = False
     move_camera()
 
@@ -188,10 +202,23 @@ def update():
                 b.kill()
                 e.health -= 40
 
-                if e.health < 0:
+                if e.health <= 0:
                     global kills
                     e.kill()
                     kills += 1
+
+    for p in pellets:
+        if p.rect.right < 0 or p.rect.left > pygame.display.get_surface().get_size()[0]:
+            p.kill()
+
+        if p.rect.colliderect(playable.rect.x, playable.rect.y, playable.width, playable.height):
+            p.kill()
+            playable.health -= 20
+
+            if playable.health <= 0:
+                playable.lives -= 1
+                playable.reset()
+                reset_level()
 
     for tile in tiles:
         if tile.rect.right >= 0 and tile.rect.left <= pygame.display.get_surface().get_size()[0]:
@@ -205,6 +232,12 @@ def update():
         reset_level()
 
     for e in enemies:
+
+        if playable.rect.x > e.rect.x:
+            e.facing = 1
+
+        elif playable.rect.x < e.rect.x:
+            e.facing = -1
 
         for ti in tiles:
 
@@ -284,11 +317,51 @@ def draw():
     enemies.draw(window)
     entities.draw(window)
     bullets.draw(window)
+    pellets.draw(window)
     
     draw_hud()
+    draw_health()
 
     if show_fps:
         draw_frame_rate()
+
+
+def draw_health():
+
+    pygame.draw.rect(window, (0, 0, 0, 0), (playable.rect.x, playable.rect.y - 15, 60, 10), 3)
+    p_health = pygame.Surface((playable.health / 100 * 56, 6))
+
+    if playable.health / 100 * 56 > 70 / 100 * 56:
+        p_health.fill((0, 255, 0))
+
+    elif playable.health / 100 * 56 <= 30 / 100 * 56:
+        p_health.fill((255, 0, 0))
+
+    elif playable.health / 100 * 56 <= 50 / 100 * 56:
+        p_health.fill((255, 255, 0))
+
+    elif playable.health / 100 * 56 <= 70 / 100 * 56:
+        p_health.fill((255, 165, 0))
+
+    window.blit(p_health, (playable.rect.x + 2, playable.rect.y - 13))
+
+    for e in enemies:
+        pygame.draw.rect(window, (0, 0, 0, 0), (e.rect.x + 10, e.rect.y - 15, 60, 10), 3)
+        e_health = pygame.Surface((e.health / 100 * 56, 6))
+
+        if e.health / 100 * 56 > 70 / 100 * 56:
+            e_health.fill((0, 255, 0))
+
+        elif e.health / 100 * 56 <= 30 / 100 * 56:
+            e_health.fill((255, 0, 0))
+
+        elif e.health / 100 * 56 <= 50 / 100 * 56:
+            e_health.fill((255, 255, 0))
+
+        elif e.health / 100 * 56 <= 70 / 100 * 56:
+            e_health.fill((255, 165, 0))
+
+        window.blit(e_health, (e.rect.x + 12, e.rect.y - 13))
 
 
 def draw_hud():
@@ -411,6 +484,8 @@ level_music = sounds.Sound(str(levels.level_num), sounds.sound_lengths[str(level
 jump_sound = sounds.Sound("jump", sounds.sound_lengths["jump"], 1)
 jump_sound.set_volume(0.3)
 
+prev_time = 0
+cur_time = 0
 
 while running:
 
@@ -421,6 +496,29 @@ while running:
         running = False
 
     if playing == 1:
+        cur_time = pygame.time.get_ticks()
+
+        if cur_time - prev_time > 3000:
+            prev_time = cur_time
+
+            for e in enemies:
+
+                if e.rect.right < pygame.display.get_surface().get_size()[0] and e.rect.left > 0:
+
+                    if e.rect.top > 0 and e.rect.bottom < pygame.display.get_surface().get_size()[1]:
+
+                        p = bullet.Pellet(e.rect.right, e.rect.top + 60)
+
+                        if e.facing == -1:
+                            p.direction = -1
+                            p.image = pygame.transform.flip(p.original_image, True, False)
+                            p.pos.x = e.rect.left
+
+                        elif e.facing == 1:
+                            p.direction = 1
+
+                        pellets.add(p)
+
         for event in pygame.event.get():
 
             if event.type == QUIT:
@@ -445,16 +543,20 @@ while running:
                 if event.button == 1:
                     playable.firing = True
                     b = bullet.Bullet(playable.rect.right, playable.rect.top + 30)
-                    if playable.acc.x >= 0:
+                    if pygame.mouse.get_pos()[0] > playable.rect.centerx:
                         b.direction = 1
 
-                    elif playable.acc.x < 0:
+                    elif pygame.mouse.get_pos()[0] < playable.rect.centerx:
                         b.direction = -1
                         b.image = pygame.transform.flip(b.original_image, True, False)
                         b.pos.x = playable.rect.left
 
+                        playable.original_image = playable.walking_frames_l[0]
+                        playable.original_image.set_colorkey((255, 0, 255))
+                        playable.image = playable.original_image
+
                     bullets.add(b)
-        
+
         if playable.lives == 0:
             playing = False  # show menu screen
 

@@ -30,6 +30,7 @@ class Enemy(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.rect.midbottom = self.pos
         self.original_rect = self.rect.copy()
+        self.facing = -1
 
         self.last_update = 0
         self.current_frame = 0
@@ -48,7 +49,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.midbottom = self.pos
 
         if self.rect.bottom > pygame.display.get_surface().get_size()[1]:
-            self.rect.bottom = pygame.display.get_surface().get_size()[1]
+            self.kill()
 
     def animate(self):
         now = pygame.time.get_ticks()

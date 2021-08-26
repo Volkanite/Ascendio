@@ -42,6 +42,8 @@ class Player(pygame.sprite.Sprite):
         self.start_time = pygame.time.get_ticks()
         self.end_time = 0
 
+        self.health = 100
+
     def load_images(self):
         self.idle_frames = [self.spritesheet.get_image(0, 120, 60, 120),
                             self.spritesheet.get_image(60, 120, 60, 120)]
@@ -74,6 +76,7 @@ class Player(pygame.sprite.Sprite):
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.jumping = False
+        self.health = 100
         
     def jump(self, able):
         if able:
