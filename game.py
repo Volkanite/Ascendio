@@ -110,6 +110,7 @@ def reset_level():
 
     for e in enemies:
         e.pos.x = e.original_rect.x
+        e.pos.y = e.original_rect.y
         e.rect.midbottom = e.pos
 
 
